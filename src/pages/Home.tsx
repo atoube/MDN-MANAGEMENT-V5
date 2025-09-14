@@ -1,114 +1,139 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { ArrowRight, Users, FileText, Calendar, Settings } from 'lucide-react';
+import { 
+  Building2, 
+  Users, 
+  FileText, 
+  TrendingUp,
+  Shield,
+  Clock,
+  CheckCircle,
+  Star
+} from 'lucide-react';
 
 const Home: React.FC = () => {
+  const features = [
+    {
+      icon: Users,
+      title: 'Gestion des Employés',
+      description: 'Gérez facilement vos employés, leurs informations et leurs performances.',
+    },
+    {
+      icon: FileText,
+      title: 'Gestion de Projets',
+      description: 'Suivez vos projets de A à Z avec des outils de gestion avancés.',
+    },
+    {
+      icon: TrendingUp,
+      title: 'Analytics & Rapports',
+      description: 'Analysez les performances avec des tableaux de bord détaillés.',
+    },
+    {
+      icon: Shield,
+      title: 'Sécurité',
+      description: 'Vos données sont protégées avec les meilleures pratiques de sécurité.',
+    },
+    {
+      icon: Clock,
+      title: 'Temps Réel',
+      description: 'Suivez les activités en temps réel pour une meilleure réactivité.',
+    },
+    {
+      icon: CheckCircle,
+      title: 'Fiabilité',
+      description: 'Une solution éprouvée et fiable pour votre entreprise.',
+    },
+  ];
+
+  const stats = [
+    { label: 'Employés Gérés', value: '500+' },
+    { label: 'Projets Terminés', value: '1,200+' },
+    { label: 'Clients Satisfaits', value: '98%' },
+    { label: 'Uptime', value: '99.9%' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            MADON Management Suite
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Solution complète de gestion d'entreprise pour optimiser vos processus, 
-            gérer vos équipes et suivre vos performances.
-          </p>
-          <Button size="lg" className="text-lg px-8 py-4">
+    <div className="space-y-12">
+      {/* Hero Section */}
+      <div className="text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+          Bienvenue dans{' '}
+          <span className="text-blue-600">MADON Management Suite</span>
+        </h1>
+        <p className="mt-6 text-lg leading-8 text-gray-600 max-w-3xl mx-auto">
+          La solution complète pour gérer votre entreprise. Gérez vos employés, 
+          projets, finances et bien plus encore avec une interface moderne et intuitive.
+        </p>
+        <div className="mt-10 flex items-center justify-center gap-x-6">
+          <button className="rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
             Commencer maintenant
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          </button>
+          <button className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600">
+            En savoir plus <span aria-hidden="true">→</span>
+          </button>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <CardTitle>Gestion des Employés</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Gérez efficacement vos équipes, profils, et informations personnelles.
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <FileText className="h-12 w-12 text-green-600 mx-auto mb-4" />
-              <CardTitle>Gestion des Projets</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Suivez vos projets, tâches et collaborateurs en temps réel.
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Calendar className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-              <CardTitle>Gestion des Absences</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Gérez les demandes de congés et le planning de vos équipes.
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Settings className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-              <CardTitle>Configuration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Personnalisez votre environnement de travail selon vos besoins.
-              </CardDescription>
-            </CardContent>
-          </Card>
+      {/* Stats */}
+      <div className="bg-white py-12 rounded-lg shadow">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-3xl font-bold text-blue-600">{stat.value}</div>
+                <div className="text-sm text-gray-500">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
+      </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-center mb-8">Fonctionnalités Principales</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-xl font-semibold mb-4">📊 Tableau de Bord</h3>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Vue d'ensemble des métriques clés</li>
-                <li>• Graphiques et statistiques en temps réel</li>
-                <li>• Notifications et alertes</li>
-                <li>• Accès rapide aux fonctionnalités</li>
-              </ul>
+      {/* Features */}
+      <div>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+            Fonctionnalités Principales
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Tout ce dont vous avez besoin pour gérer votre entreprise efficacement
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature, index) => (
+            <div key={index} className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0">
+                  <feature.icon className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="ml-3 text-lg font-medium text-gray-900">
+                  {feature.title}
+                </h3>
+              </div>
+              <p className="text-gray-600">
+                {feature.description}
+              </p>
             </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-4">👥 Gestion d'Équipe</h3>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Profils employés complets</li>
-                <li>• Gestion des rôles et permissions</li>
-                <li>• Suivi des performances</li>
-                <li>• Communication intégrée</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-4">📋 Gestion de Projets</h3>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Planification et suivi des tâches</li>
-                <li>• Collaboration en équipe</li>
-                <li>• Gestion des documents</li>
-                <li>• Rapports de progression</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-4">📅 Gestion des Absences</h3>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Demandes de congés</li>
-                <li>• Planning et calendrier</li>
-                <li>• Approbations et notifications</li>
-                <li>• Historique des absences</li>
-              </ul>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-blue-600 rounded-lg">
+        <div className="px-6 py-12 sm:px-6 sm:py-16 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Prêt à transformer votre entreprise ?
+            </h2>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-blue-100">
+              Rejoignez des milliers d'entreprises qui font confiance à MADON Suite 
+              pour gérer leurs opérations quotidiennes.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <button className="rounded-md bg-white px-6 py-3 text-sm font-semibold text-blue-600 shadow-sm hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                Essai gratuit
+              </button>
+              <button className="text-sm font-semibold leading-6 text-white hover:text-blue-100">
+                Contacter les ventes <span aria-hidden="true">→</span>
+              </button>
             </div>
           </div>
         </div>

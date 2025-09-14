@@ -1,132 +1,171 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
-import { Button } from './ui/Button';
-import { Users, FileText, Calendar, TrendingUp } from 'lucide-react';
+import { 
+  Users, 
+  FileText, 
+  TrendingUp, 
+  Calendar,
+  DollarSign,
+  Activity
+} from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const stats = [
     {
-      title: 'Employés',
+      name: 'Total Employés',
       value: '24',
-      description: 'Total des employés actifs',
+      change: '+2.1%',
+      changeType: 'positive',
       icon: Users,
-      color: 'text-blue-600'
     },
     {
-      title: 'Projets',
-      value: '8',
-      description: 'Projets en cours',
+      name: 'Projets Actifs',
+      value: '12',
+      change: '+5.4%',
+      changeType: 'positive',
       icon: FileText,
-      color: 'text-green-600'
     },
     {
-      title: 'Absences',
-      value: '3',
-      description: 'Demandes en attente',
-      icon: Calendar,
-      color: 'text-orange-600'
+      name: 'Revenus Mensuels',
+      value: '€45,231',
+      change: '+12.5%',
+      changeType: 'positive',
+      icon: DollarSign,
     },
     {
-      title: 'Performance',
-      value: '92%',
-      description: 'Taux de réussite',
+      name: 'Taux de Réussite',
+      value: '94.5%',
+      change: '+2.1%',
+      changeType: 'positive',
       icon: TrendingUp,
-      color: 'text-purple-600'
-    }
+    },
+  ];
+
+  const recentActivities = [
+    {
+      id: 1,
+      type: 'employee',
+      message: 'Nouvel employé ajouté: Jean Dupont',
+      time: 'Il y a 2 heures',
+    },
+    {
+      id: 2,
+      type: 'project',
+      message: 'Projet "Site Web" terminé avec succès',
+      time: 'Il y a 4 heures',
+    },
+    {
+      id: 3,
+      type: 'document',
+      message: 'Document "Contrat 2024" mis à jour',
+      time: 'Il y a 6 heures',
+    },
+    {
+      id: 4,
+      type: 'meeting',
+      message: 'Réunion d\'équipe programmée pour demain',
+      time: 'Il y a 8 heures',
+    },
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Tableau de Bord</h1>
-        <p className="text-gray-600 mt-2">Bienvenue dans MADON Management Suite</p>
+        <h1 className="text-2xl font-bold text-gray-900">Tableau de bord</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Vue d'ensemble de votre entreprise et des performances
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={index}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <Icon className={`h-4 w-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stat.description}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Stats */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <div
+            key={stat.name}
+            className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:px-6 sm:py-6"
+          >
+            <dt>
+              <div className="absolute rounded-md bg-blue-500 p-3">
+                <stat.icon className="h-6 w-6 text-white" />
+              </div>
+              <p className="ml-16 truncate text-sm font-medium text-gray-500">
+                {stat.name}
+              </p>
+            </dt>
+            <dd className="ml-16 flex items-baseline">
+              <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+              <p
+                className={`ml-2 flex items-baseline text-sm font-semibold ${
+                  stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
+                {stat.change}
+              </p>
+            </dd>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Activités Récentes</CardTitle>
-            <CardDescription>
-              Dernières activités de l'équipe
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Nouveau projet créé</p>
-                  <p className="text-xs text-gray-500">Il y a 2 heures</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Employé ajouté</p>
-                  <p className="text-xs text-gray-500">Il y a 4 heures</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Demande d'absence</p>
-                  <p className="text-xs text-gray-500">Il y a 6 heures</p>
-                </div>
-              </div>
+      {/* Charts and Activities */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Performance Chart */}
+        <div className="rounded-lg bg-white p-6 shadow">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Performance Mensuelle
+          </h3>
+          <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+            <div className="text-center">
+              <Activity className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+              <p className="text-gray-500">Graphique de performance</p>
+              <p className="text-sm text-gray-400">Données en cours de chargement...</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Actions Rapides</CardTitle>
-            <CardDescription>
-              Accès rapide aux fonctionnalités principales
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                <Users className="h-6 w-6 mb-2" />
-                <span className="text-sm">Employés</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                <FileText className="h-6 w-6 mb-2" />
-                <span className="text-sm">Projets</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                <Calendar className="h-6 w-6 mb-2" />
-                <span className="text-sm">Absences</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                <TrendingUp className="h-6 w-6 mb-2" />
-                <span className="text-sm">Rapports</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Recent Activities */}
+        <div className="rounded-lg bg-white p-6 shadow">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Activités Récentes
+          </h3>
+          <div className="space-y-4">
+            {recentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-start space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full mt-2"></div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900">{activity.message}</p>
+                  <p className="text-xs text-gray-500">{activity.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="rounded-lg bg-white p-6 shadow">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Actions Rapides
+        </h3>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <button className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+            <Users className="h-5 w-5 mr-2" />
+            Ajouter Employé
+          </button>
+          <button className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+            <FileText className="h-5 w-5 mr-2" />
+            Nouveau Projet
+          </button>
+          <button className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+            <Calendar className="h-5 w-5 mr-2" />
+            Planifier Réunion
+          </button>
+          <button className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+            <DollarSign className="h-5 w-5 mr-2" />
+            Gérer Finances
+          </button>
+        </div>
       </div>
     </div>
   );
