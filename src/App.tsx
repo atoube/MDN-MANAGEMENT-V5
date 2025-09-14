@@ -10,6 +10,10 @@ import Employees from './pages/Employees';
 import Documents from './pages/Documents';
 import Tasks from './pages/Tasks';
 import Settings from './pages/Settings';
+import ApiHello from './pages/ApiHello';
+import ApiTestConnection from './pages/ApiTestConnection';
+import ApiEmployees from './pages/ApiEmployees';
+import ApiTasks from './pages/ApiTasks';
 import './index.css';
 
 function App() {
@@ -18,6 +22,10 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/api/hello" element={<ApiHello />} />
+          <Route path="/api/test-connection" element={<ApiTestConnection />} />
+          <Route path="/api/employees" element={<ApiEmployees />} />
+          <Route path="/api/tasks" element={<ApiTasks />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
