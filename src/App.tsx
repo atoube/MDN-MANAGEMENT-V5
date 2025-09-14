@@ -14,6 +14,7 @@ import ApiHello from './pages/ApiHello';
 import ApiTestConnection from './pages/ApiTestConnection';
 import ApiEmployees from './pages/ApiEmployees';
 import ApiTasks from './pages/ApiTasks';
+import Test from './pages/Test';
 import './index.css';
 
 function App() {
@@ -22,10 +23,11 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/api/hello" element={<ApiHello />} />
-          <Route path="/api/test-connection" element={<ApiTestConnection />} />
-          <Route path="/api/employees" element={<ApiEmployees />} />
-          <Route path="/api/tasks" element={<ApiTasks />} />
+          <Route path="/test" element={<Test />} />
+          <Route path="/data/hello" element={<ApiHello />} />
+          <Route path="/data/test-connection" element={<ApiTestConnection />} />
+          <Route path="/data/employees" element={<ApiEmployees />} />
+          <Route path="/data/tasks" element={<ApiTasks />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
