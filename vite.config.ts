@@ -13,7 +13,21 @@ export default defineConfig({
   optimizeDeps: {
     include: ['cmdk']
   },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+        },
+      },
+    },
+  },
+  base: '/',
   define: {
-    // Suppression des variables d'environnement Supabase
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
 });
