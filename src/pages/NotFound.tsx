@@ -1,26 +1,47 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Home, ArrowLeft } from 'lucide-react';
 
 const NotFound: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full text-center">
-        <h1 className="text-9xl font-bold text-blue-600">404</h1>
-        <h2 className="mt-4 text-3xl font-bold text-gray-900">Page non trouvée</h2>
-        <p className="mt-2 text-gray-600">
-          Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Retour à l'accueil
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md text-center">
+        <CardHeader>
+          <div className="mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+            <span className="text-4xl">🔍</span>
+          </div>
+          <CardTitle className="text-2xl font-bold">Page non trouvée</CardTitle>
+          <CardDescription>
+            La page que vous recherchez n'existe pas ou a été déplacée.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-6xl font-bold text-gray-300">404</div>
+          <div className="space-y-2">
+            <Button 
+              onClick={() => navigate('/dashboard')}
+              className="w-full"
+            >
+              <Home className="mr-2 h-4 w-4" />
+              Retour au tableau de bord
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => navigate(-1)}
+              className="w-full"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Page précédente
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default NotFound; 
+export default NotFound;

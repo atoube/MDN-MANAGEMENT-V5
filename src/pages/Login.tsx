@@ -1,141 +1,104 @@
 import React, { useState } from 'react';
-import { apiService } from '../lib/api';
-import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Label } from '../components/ui/Label';
+import { toast } from 'sonner';
+import { Eye, EyeOff, LogIn } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
 
-    try {
-      // Simulated sign in - using mock data
-
-      if (error) {
-        throw error;
+    // Simulation d'authentification
+    setTimeout(() => {
+      if (email && password) {
+        toast.success('Connexion réussie !');
+        navigate('/dashboard');
+      } else {
+        toast.error('Veuillez remplir tous les champs');
       }
-
-      toast.success('Connexion réussie');
-    } catch (err) {
-      console.error('Erreur de connexion:', err);
-      const authError = err as AuthError;
-      
-      let errorMessage = 'Erreur de connexion. Veuillez vérifier vos identifiants.';
-      
-      if (authError.message) {
-        switch (authError.message) {
-          case 'Invalid login credentials':
-            errorMessage = 'Identifiants invalides. Veuillez vérifier votre email et mot de passe.';
-            break;
-          case 'Email not confirmed':
-            errorMessage = 'Email non confirmé. Veuillez vérifier votre boîte mail.';
-            break;
-          case 'Too many requests':
-            errorMessage = 'Trop de tentatives. Veuillez réessayer plus tard.';
-            break;
-          default:
-            errorMessage = `Erreur: ${authError.message}`;
-        }
-      }
-      
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
       setIsLoading(false);
-    }
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Connexion à votre compte
-          </h2>
-          {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Adresse email
-              </label>
-              <input
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+            <LogIn className="h-8 w-8 text-white" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
+          <CardDescription>
+            Connectez-vous à MADON Management Suite
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
                 id="email"
-                name="email"
                 type="email"
-                required
+                placeholder="votre@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Adresse email"
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Mot de passe
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Mot de passe"
               />
             </div>
-          </div>
-
-          <div>
-            <button
+            <div className="space-y-2">
+              <Label htmlFor="password">Mot de passe</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Votre mot de passe"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+            <Button
               type="submit"
+              className="w-full"
               disabled={isLoading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             >
-              {isLoading ? (
-                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                </span>
-              ) : null}
-              {isLoading ? 'Connexion en cours...' : 'Se connecter'}
-            </button>
+              {isLoading ? 'Connexion...' : 'Se connecter'}
+            </Button>
+          </form>
+          
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Démo - Utilisez n'importe quel email et mot de passe
+            </p>
           </div>
-        </form>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default Login; 
+export default Login;
