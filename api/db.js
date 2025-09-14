@@ -1,5 +1,5 @@
 // Configuration de la base de données pour Railway
-import mysql from 'mysql2/promise';
+const mysql = require('mysql2/promise');
 
 // Configuration de la connexion
 const dbConfig = {
@@ -16,7 +16,7 @@ const dbConfig = {
 // Pool de connexions
 let pool = null;
 
-export const getConnection = async () => {
+const getConnection = async () => {
   if (!pool) {
     pool = mysql.createPool(dbConfig);
   }
@@ -24,7 +24,7 @@ export const getConnection = async () => {
 };
 
 // Test de connexion
-export const testConnection = async () => {
+const testConnection = async () => {
   try {
     const connection = await getConnection();
     const [rows] = await connection.execute('SELECT 1 as test');
@@ -36,7 +36,7 @@ export const testConnection = async () => {
 };
 
 // Initialisation de la base de données
-export const initDatabase = async () => {
+const initDatabase = async () => {
   try {
     const connection = await getConnection();
     
@@ -159,4 +159,4 @@ const insertTestData = async (connection) => {
   }
 };
 
-export default { getConnection, testConnection, initDatabase };
+module.exports = { getConnection, testConnection, initDatabase };

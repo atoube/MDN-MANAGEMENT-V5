@@ -1,7 +1,7 @@
 // API route pour la gestion des tâches
-import { getConnection } from './db.js';
+const { getConnection } = require('./db.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Configuration CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
