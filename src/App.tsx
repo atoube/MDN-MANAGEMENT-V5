@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import Layout from './components/Layout';
-import Dashboard from './components/Dashboard';
+import { Layout } from './components/Layout';
+import { Dashboard } from './components/Dashboard';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';

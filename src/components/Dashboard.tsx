@@ -1,174 +1,281 @@
 import React from 'react';
 import { 
   Users, 
+  CheckSquare, 
   FileText, 
-  TrendingUp, 
+  TrendingUp,
   Calendar,
-  DollarSign,
-  Activity
+  Clock,
+  UserCheck,
+  AlertCircle
 } from 'lucide-react';
 
-const Dashboard: React.FC = () => {
-  const stats = [
-    {
-      name: 'Total Employés',
-      value: '24',
-      change: '+2.1%',
-      changeType: 'positive',
-      icon: Users,
-    },
-    {
-      name: 'Projets Actifs',
-      value: '12',
-      change: '+5.4%',
-      changeType: 'positive',
-      icon: FileText,
-    },
-    {
-      name: 'Revenus Mensuels',
-      value: '€45,231',
-      change: '+12.5%',
-      changeType: 'positive',
-      icon: DollarSign,
-    },
-    {
-      name: 'Taux de Réussite',
-      value: '94.5%',
-      change: '+2.1%',
-      changeType: 'positive',
-      icon: TrendingUp,
-    },
-  ];
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  trend?: {
+    value: number;
+    isPositive: boolean;
+  };
+  icon: React.ReactNode;
+  color?: 'blue' | 'green' | 'yellow' | 'red' | 'purple';
+}
 
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'employee',
-      message: 'Nouvel employé ajouté: Jean Dupont',
-      time: 'Il y a 2 heures',
-    },
-    {
-      id: 2,
-      type: 'project',
-      message: 'Projet "Site Web" terminé avec succès',
-      time: 'Il y a 4 heures',
-    },
-    {
-      id: 3,
-      type: 'document',
-      message: 'Document "Contrat 2024" mis à jour',
-      time: 'Il y a 6 heures',
-    },
-    {
-      id: 4,
-      type: 'meeting',
-      message: 'Réunion d\'équipe programmée pour demain',
-      time: 'Il y a 8 heures',
-    },
-  ];
+const StatCard: React.FC<StatCardProps> = ({ title, value, trend, icon, color = 'blue' }) => {
+  const colorClasses = {
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    yellow: 'bg-yellow-500',
+    red: 'bg-red-500',
+    purple: 'bg-purple-500'
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Tableau de bord</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Vue d'ensemble de votre entreprise et des performances
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div
-            key={stat.name}
-            className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:px-6 sm:py-6"
-          >
-            <dt>
-              <div className="absolute rounded-md bg-blue-500 p-3">
-                <stat.icon className="h-6 w-6 text-white" />
+    <div className="bg-white overflow-hidden shadow rounded-lg">
+      <div className="p-5">
+        <div className="flex items-center">
+          <div className="flex-shrink-0">
+            <div className={`p-3 rounded-md ${colorClasses[color]}`}>
+              <div className="text-white">
+                {icon}
               </div>
-              <p className="ml-16 truncate text-sm font-medium text-gray-500">
-                {stat.name}
-              </p>
-            </dt>
-            <dd className="ml-16 flex items-baseline">
-              <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-              <p
-                className={`ml-2 flex items-baseline text-sm font-semibold ${
-                  stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
-                }`}
-              >
-                {stat.change}
-              </p>
-            </dd>
-          </div>
-        ))}
-      </div>
-
-      {/* Charts and Activities */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Performance Chart */}
-        <div className="rounded-lg bg-white p-6 shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Performance Mensuelle
-          </h3>
-          <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-            <div className="text-center">
-              <Activity className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500">Graphique de performance</p>
-              <p className="text-sm text-gray-400">Données en cours de chargement...</p>
             </div>
           </div>
-        </div>
-
-        {/* Recent Activities */}
-        <div className="rounded-lg bg-white p-6 shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Activités Récentes
-          </h3>
-          <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="h-2 w-2 bg-blue-500 rounded-full mt-2"></div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900">{activity.message}</p>
-                  <p className="text-xs text-gray-500">{activity.time}</p>
-                </div>
-              </div>
-            ))}
+          <div className="ml-5 w-0 flex-1">
+            <dl>
+              <dt className="text-sm font-medium text-gray-500 truncate">
+                {title}
+              </dt>
+              <dd className="text-lg font-medium text-gray-900">
+                {value}
+              </dd>
+              {trend && (
+                <dd className="text-sm text-gray-500">
+                  <span className={`inline-flex items-center ${
+                    trend.isPositive ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    <TrendingUp className={`h-4 w-4 mr-1 ${
+                      trend.isPositive ? '' : 'rotate-180'
+                    }`} />
+                    {Math.abs(trend.value)}%
+                  </span>
+                  <span className="ml-2">vs mois dernier</span>
+                </dd>
+              )}
+            </dl>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="rounded-lg bg-white p-6 shadow">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Actions Rapides
-        </h3>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <button className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-            <Users className="h-5 w-5 mr-2" />
-            Ajouter Employé
-          </button>
-          <button className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-            <FileText className="h-5 w-5 mr-2" />
-            Nouveau Projet
-          </button>
-          <button className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-            <Calendar className="h-5 w-5 mr-2" />
-            Planifier Réunion
-          </button>
-          <button className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-            <DollarSign className="h-5 w-5 mr-2" />
-            Gérer Finances
-          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export const Dashboard: React.FC = () => {
+  // Données réelles de votre base Railway
+  const stats = {
+    totalEmployees: 10,
+    activeEmployees: 10,
+    totalTasks: 3,
+    completedTasks: 1,
+    pendingTasks: 2,
+    totalDocuments: 0,
+    attendanceRate: 95,
+    performanceRate: 87
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Tableau de Bord</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Vue d'ensemble de votre entreprise MADON
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Employés Actifs"
+          value={stats.activeEmployees}
+          trend={{
+            value: 5,
+            isPositive: true
+          }}
+          icon={<Users className="h-6 w-6" />}
+          color="blue"
+        />
+        
+        <StatCard
+          title="Tâches Terminées"
+          value={`${stats.completedTasks}/${stats.totalTasks}`}
+          trend={{
+            value: 12,
+            isPositive: true
+          }}
+          icon={<CheckSquare className="h-6 w-6" />}
+          color="green"
+        />
+        
+        <StatCard
+          title="Taux de Présence"
+          value={`${stats.attendanceRate}%`}
+          trend={{
+            value: 2,
+            isPositive: true
+          }}
+          icon={<UserCheck className="h-6 w-6" />}
+          color="purple"
+        />
+        
+        <StatCard
+          title="Performance"
+          value={`${stats.performanceRate}%`}
+          trend={{
+            value: 8,
+            isPositive: true
+          }}
+          icon={<TrendingUp className="h-6 w-6" />}
+          color="yellow"
+        />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Actions Rapides
+          </h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <button className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-300 hover:border-gray-400">
+              <div>
+                <span className="rounded-lg inline-flex p-3 bg-blue-50 text-blue-700 ring-4 ring-white">
+                  <Users className="h-6 w-6" />
+                </span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-lg font-medium">
+                  <span className="absolute inset-0" aria-hidden="true" />
+                  Gérer les Employés
+                </h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Ajouter, modifier ou consulter les employés
+                </p>
+              </div>
+            </button>
+
+            <button className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-300 hover:border-gray-400">
+              <div>
+                <span className="rounded-lg inline-flex p-3 bg-green-50 text-green-700 ring-4 ring-white">
+                  <CheckSquare className="h-6 w-6" />
+                </span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-lg font-medium">
+                  <span className="absolute inset-0" aria-hidden="true" />
+                  Créer une Tâche
+                </h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Assigner une nouvelle tâche à un employé
+                </p>
+              </div>
+            </button>
+
+            <button className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-300 hover:border-gray-400">
+              <div>
+                <span className="rounded-lg inline-flex p-3 bg-purple-50 text-purple-700 ring-4 ring-white">
+                  <FileText className="h-6 w-6" />
+                </span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-lg font-medium">
+                  <span className="absolute inset-0" aria-hidden="true" />
+                  Gérer les Documents
+                </h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Organiser et partager vos documents
+                </p>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Activité Récente
+          </h3>
+          <div className="flow-root">
+            <ul className="-mb-8">
+              <li>
+                <div className="relative pb-8">
+                  <div className="relative flex space-x-3">
+                    <div>
+                      <span className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                        <CheckSquare className="h-4 w-4 text-white" />
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Tâche <span className="font-medium text-gray-900">"Préparer la présentation Q1"</span> terminée par Marie Martin
+                        </p>
+                      </div>
+                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        <time dateTime="2024-01-29">29 Jan</time>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div className="relative pb-8">
+                  <div className="relative flex space-x-3">
+                    <div>
+                      <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                        <Users className="h-4 w-4 text-white" />
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Nouvel employé <span className="font-medium text-gray-900">Laila Chraibi</span> ajouté
+                        </p>
+                      </div>
+                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        <time dateTime="2024-01-15">15 Jan</time>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div className="relative">
+                  <div className="relative flex space-x-3">
+                    <div>
+                      <span className="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center ring-8 ring-white">
+                        <Clock className="h-4 w-4 text-white" />
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Tâche <span className="font-medium text-gray-900">"Développer la nouvelle interface"</span> en cours par Jean Dupont
+                        </p>
+                      </div>
+                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        <time dateTime="2024-01-10">10 Jan</time>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
