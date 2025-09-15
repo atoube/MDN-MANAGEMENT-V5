@@ -13,13 +13,18 @@ import {
   Settings,
   Eye,
   EyeOff,
-  File
+  File,
+  Download,
+  Upload,
+  BarChart3
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useEmployees } from '../hooks/useEmployees';
 import { useTasks } from '../hooks/useTasks';
 import { useRailwayConnection } from '../hooks/useRailwayConnection';
+import { PerformanceMonitor } from './PerformanceMonitor';
+import { ExportImportManager } from './ExportImportManager';
 
 interface StatCardProps {
   title: string;
@@ -137,6 +142,7 @@ export const Dashboard: React.FC = () => {
   const { isConnected, isLoading: connectionLoading } = useRailwayConnection();
   
   const [isSalaryVisible, setIsSalaryVisible] = useState(false);
+  const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
 
   // Calculer les statistiques réelles
   const stats = {
@@ -380,6 +386,147 @@ export const Dashboard: React.FC = () => {
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Section Fonctionnalités Avancées */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Fonctionnalités Avancées</h2>
+          <Button
+            variant="outline"
+            onClick={() => setShowAdvancedFeatures(!showAdvancedFeatures)}
+          >
+            {showAdvancedFeatures ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+            {showAdvancedFeatures ? 'Masquer' : 'Afficher'}
+          </Button>
+        </div>
+
+        {showAdvancedFeatures && (
+          <div className="space-y-6">
+            {/* Monitoring des Performances */}
+            <PerformanceMonitor />
+
+            {/* Export/Import Manager */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Download className="h-5 w-5 mr-2" />
+                  Gestion des Données
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">Export des Employés</h4>
+                    <ExportImportManager
+                      data={employees}
+                      module="employees"
+                      requiredFields={['first_name', 'last_name', 'email']}
+                      onImport={(data) => {
+                        console.log('Import employees:', data);
+                        // Ici vous pouvez implémenter la logique d'import
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">Export des Tâches</h4>
+                    <ExportImportManager
+                      data={tasks}
+                      module="tasks"
+                      requiredFields={['title', 'status', 'priority']}
+                      onImport={(data) => {
+                        console.log('Import tasks:', data);
+                        // Ici vous pouvez implémenter la logique d'import
+                      }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Statistiques Avancées */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2" />
+                    Performance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Taux de complétion</span>
+                      <span className="font-medium">{getTaskStats().completionRate}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Tâches en retard</span>
+                      <span className="font-medium text-red-600">{getTaskStats().overdue}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Employés actifs</span>
+                      <span className="font-medium text-green-600">{stats.activeEmployees}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Activity className="h-5 w-5 mr-2" />
+                    Activité
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Tâches créées</span>
+                      <span className="font-medium">{stats.totalTasks}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Tâches terminées</span>
+                      <span className="font-medium">{stats.completedTasks}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">En attente</span>
+                      <span className="font-medium">{stats.pendingTasks}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Settings className="h-5 w-5 mr-2" />
+                    Système
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Base de données</span>
+                      <Badge className={isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                        {isConnected ? 'Connectée' : 'Déconnectée'}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Utilisateur</span>
+                      <span className="font-medium">{user?.first_name} {user?.last_name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Rôle</span>
+                      <Badge className="bg-blue-100 text-blue-800">
+                        {user?.role}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
