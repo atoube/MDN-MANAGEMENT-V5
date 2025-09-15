@@ -10,10 +10,7 @@
     },
     {
       "src": "api/**/*.js",
-      "use": "@vercel/node",
-      "config": {
-        "runtime": "nodejs18.x"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -34,14 +31,6 @@
       "dest": "/index.html"
     }
   ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "installCommand": "npm install",
   "buildCommand": "npm run build"
 }
