@@ -1,14 +1,14 @@
 // Configuration de la base de données pour Railway
 const mysql = require('mysql2/promise');
 
-// Configuration de la connexion
+// Configuration de la connexion Railway
 const dbConfig = {
-  host: process.env.RAILWAY_DB_HOST || process.env.VITE_DB_HOST || 'localhost',
-  port: process.env.RAILWAY_DB_PORT || process.env.VITE_DB_PORT || 3306,
-  user: process.env.RAILWAY_DB_USER || process.env.VITE_DB_USER || 'root',
-  password: process.env.RAILWAY_DB_PASSWORD || process.env.VITE_DB_PASSWORD || '',
-  database: process.env.RAILWAY_DB_NAME || process.env.VITE_DB_NAME || 'MDN_SUITE',
-  ssl: process.env.RAILWAY_DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  host: process.env.RAILWAY_DB_HOST || 'centerbeam.proxy.rlwy.net',
+  port: parseInt(process.env.RAILWAY_DB_PORT || '26824'),
+  user: process.env.RAILWAY_DB_USER || 'root',
+  password: process.env.RAILWAY_DB_PASSWORD || 'eNMmLvQjDIBHXwPmEqaVutQQDKTwEKsD',
+  database: process.env.RAILWAY_DB_NAME || 'railway',
+  ssl: { rejectUnauthorized: false },
   connectionLimit: 10,
   queueLimit: 0,
 };

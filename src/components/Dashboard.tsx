@@ -16,6 +16,10 @@ import {
   File
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useEmployees } from '../hooks/useEmployees';
+import { useTasks } from '../hooks/useTasks';
+import { useRailwayConnection } from '../hooks/useRailwayConnection';
 
 interface StatCardProps {
   title: string;
@@ -127,27 +131,28 @@ const Badge: React.FC<{ children: React.ReactNode; className?: string }> = ({ ch
 );
 
 export const Dashboard: React.FC = () => {
-  const [user] = useState({
-    name: 'Admin MADON',
-    email: 'admin@madon.com',
-    role: 'admin'
-  });
-
+  const { user, hasRole } = useAuth();
+  const { employees, loading: employeesLoading } = useEmployees();
+  const { tasks, loading: tasksLoading, getTaskStats } = useTasks();
+  const { isConnected, isLoading: connectionLoading } = useRailwayConnection();
+  
   const [isSalaryVisible, setIsSalaryVisible] = useState(false);
 
-  // Données réelles de votre base Railway
+  // Calculer les statistiques réelles
   const stats = {
-    totalEmployees: 10,
-    activeEmployees: 10,
-    totalTasks: 3,
-    completedTasks: 1,
-    pendingTasks: 2,
-    totalDocuments: 0,
-    attendanceRate: 95,
-    performanceRate: 87,
-    totalSalary: 15000000, // 15M F CFA
-    pendingRequests: 0
+    totalEmployees: employees.length,
+    activeEmployees: employees.filter(emp => emp.status === 'active').length,
+    totalTasks: tasks.length,
+    completedTasks: tasks.filter(task => task.status === 'completed').length,
+    pendingTasks: tasks.filter(task => task.status === 'todo').length,
+    totalDocuments: 0, // À implémenter
+    attendanceRate: 95, // À calculer
+    performanceRate: 87, // À calculer
+    totalSalary: employees.reduce((sum, emp) => sum + (emp.salary || 0), 0),
+    pendingRequests: 0 // À implémenter
   };
+
+  const taskStats = getTaskStats();
 
   const toggleSalaryVisibility = () => {
     setIsSalaryVisible(!isSalaryVisible);
@@ -177,57 +182,27 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  // Données d'exemple pour les activités récentes
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'task',
-      title: 'Préparer la présentation Q1',
-      description: 'Tâche terminée par Marie Martin',
-      status: 'completed',
-      date: '29 Jan'
-    },
-    {
-      id: 2,
-      type: 'employee',
-      title: 'Laila Chraibi',
-      description: 'Nouvel employé ajouté',
-      status: 'approved',
-      date: '15 Jan'
-    },
-    {
-      id: 3,
-      type: 'task',
-      title: 'Développer la nouvelle interface',
-      description: 'Tâche en cours par Jean Dupont',
-      status: 'pending',
-      date: '10 Jan'
-    }
-  ];
+  // Données réelles pour les activités récentes
+  const recentActivities = tasks.slice(0, 3).map(task => ({
+    id: task.id,
+    type: 'task',
+    title: task.title,
+    description: task.assigned_employee ? 
+      `Tâche ${task.status === 'completed' ? 'terminée' : 'en cours'} par ${task.assigned_employee.first_name} ${task.assigned_employee.last_name}` :
+      'Tâche non assignée',
+    status: task.status,
+    date: task.created_at ? new Date(task.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : 'N/A'
+  }));
 
-  const recentTasks = [
-    {
-      id: 1,
-      title: 'Préparer la présentation Q1',
-      description: 'Créer une présentation pour le rapport trimestriel',
-      status: 'completed',
-      assignedTo: 'Marie Martin'
-    },
-    {
-      id: 2,
-      title: 'Développer la nouvelle interface',
-      description: 'Améliorer l\'interface utilisateur',
-      status: 'pending',
-      assignedTo: 'Jean Dupont'
-    },
-    {
-      id: 3,
-      title: 'Analyser les performances',
-      description: 'Étudier les métriques de performance',
-      status: 'pending',
-      assignedTo: 'Ahmadou Diallo'
-    }
-  ];
+  const recentTasks = tasks.slice(0, 3).map(task => ({
+    id: task.id,
+    title: task.title,
+    description: task.description || 'Pas de description',
+    status: task.status,
+    assignedTo: task.assigned_employee ? 
+      `${task.assigned_employee.first_name} ${task.assigned_employee.last_name}` :
+      'Non assigné'
+  }));
 
   return (
     <div className="p-6">
@@ -236,8 +211,9 @@ export const Dashboard: React.FC = () => {
           Tableau de Bord
         </h1>
         <p className="text-gray-600">
-          Bienvenue {user.name} ! 
-          {user.role === 'admin' && ' - Vue Administrateur'}
+          Bienvenue {user?.first_name || user?.email} ! 
+          {hasRole('admin') && ' - Vue Administrateur'}
+          {!isConnected && ' - Connexion Railway en cours...'}
         </p>
       </div>
 
@@ -289,7 +265,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Contrôle de visibilité des salaires (Admin) */}
-      {user.role === 'admin' && (
+      {hasRole('admin') && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
