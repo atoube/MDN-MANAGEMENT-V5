@@ -7,7 +7,7 @@ export interface User {
   password?: string;
   first_name: string;
   last_name: string;
-  role: 'admin' | 'user' | 'manager';
+  role: 'admin' | 'user' | 'manager' | 'hr';
   avatar_url?: string;
   created_at?: string;
   updated_at?: string;

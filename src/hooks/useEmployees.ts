@@ -15,6 +15,10 @@ export interface Employee {
   salary?: number;
   status?: 'active' | 'inactive' | 'terminated';
   avatar_url?: string;
+  photo_url?: string;
+  address?: string;
+  emergency_contact?: string;
+  emergency_phone?: string;
   created_at?: string;
   updated_at?: string;
 }
