@@ -1,5 +1,5 @@
 // API route pour l'authentification - Railway
-const { getConnection } = require('../db.js');
+const { getConnection } = require('../db.cjs');
 const bcrypt = require('bcryptjs');
 
 module.exports = async function handler(req, res) {
