@@ -39,8 +39,13 @@ export const useTasks = () => {
       setLoading(true);
       setError(null);
       
-      const data = await executeQuery('tasks');
-      setTasks(data.tasks || []);
+      const response = await fetch('/api/tasks');
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des tâches');
+      }
+      
+      const data = await response.json();
+      setTasks(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des tâches';
       setError(errorMessage);
@@ -60,13 +65,13 @@ export const useTasks = () => {
         body: JSON.stringify(taskData),
       });
 
-      if (response.ok) {
-        const newTask = await response.json();
-        setTasks(prev => [...prev, newTask.task]);
-        return newTask.task;
-      } else {
-        throw new Error(`Erreur HTTP: ${response.status}`);
+      if (!response.ok) {
+        throw new Error('Erreur lors de la création de la tâche');
       }
+
+      const newTask = await response.json();
+      setTasks(prev => [...prev, newTask]);
+      return newTask;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la création de la tâche';
       setError(errorMessage);
@@ -76,7 +81,7 @@ export const useTasks = () => {
 
   const updateTask = async (id: number, taskData: Partial<Task>) => {
     try {
-      const response = await fetch(`/api/tasks/${id}`, {
+      const response = await fetch(`/api/tasks?id=${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -84,15 +89,15 @@ export const useTasks = () => {
         body: JSON.stringify(taskData),
       });
 
-      if (response.ok) {
-        const updatedTask = await response.json();
-        setTasks(prev => 
-          prev.map(task => task.id === id ? updatedTask.task : task)
-        );
-        return updatedTask.task;
-      } else {
-        throw new Error(`Erreur HTTP: ${response.status}`);
+      if (!response.ok) {
+        throw new Error('Erreur lors de la mise à jour de la tâche');
       }
+
+      const updatedTask = await response.json();
+      setTasks(prev => 
+        prev.map(task => task.id === id ? updatedTask : task)
+      );
+      return updatedTask;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la mise à jour de la tâche';
       setError(errorMessage);
@@ -102,16 +107,16 @@ export const useTasks = () => {
 
   const deleteTask = async (id: number) => {
     try {
-      const response = await fetch(`/api/tasks/${id}`, {
+      const response = await fetch(`/api/tasks?id=${id}`, {
         method: 'DELETE',
       });
 
-      if (response.ok) {
-        setTasks(prev => prev.filter(task => task.id !== id));
-        return true;
-      } else {
-        throw new Error(`Erreur HTTP: ${response.status}`);
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suppression de la tâche');
       }
+
+      setTasks(prev => prev.filter(task => task.id !== id));
+      return { success: true };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la suppression de la tâche';
       setError(errorMessage);
@@ -161,10 +166,8 @@ export const useTasks = () => {
   };
 
   useEffect(() => {
-    if (isConnected) {
-      fetchTasks();
-    }
-  }, [isConnected]);
+    fetchTasks();
+  }, []);
 
   return {
     tasks,

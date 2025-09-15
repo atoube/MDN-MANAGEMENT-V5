@@ -16,56 +16,21 @@ module.exports = async function handler(req, res) {
 
     switch (req.method) {
       case 'GET':
-        // Récupérer toutes les tâches avec les informations des employés
+        // Récupérer toutes les tâches
         const [tasks] = await connection.execute(`
           SELECT 
-            t.id, t.title, t.description, t.status, t.priority, 
-            t.assigned_to, t.created_by, t.due_date, t.completed_at, 
-            t.created_at, t.updated_at,
-            ae.first_name as assigned_first_name,
-            ae.last_name as assigned_last_name,
-            ae.email as assigned_email,
-            ce.first_name as created_first_name,
-            ce.last_name as created_last_name,
-            ce.email as created_email
+            t.*,
+            u1.first_name as assigned_first_name,
+            u1.last_name as assigned_last_name,
+            u2.first_name as created_first_name,
+            u2.last_name as created_last_name
           FROM tasks t
-          LEFT JOIN employees ae ON t.assigned_to = ae.id
-          LEFT JOIN employees ce ON t.created_by = ce.id
+          LEFT JOIN users u1 ON t.assigned_to = u1.id
+          LEFT JOIN users u2 ON t.created_by = u2.id
           ORDER BY t.created_at DESC
         `);
 
-        // Formater les tâches avec les relations
-        const formattedTasks = tasks.map(task => ({
-          id: task.id,
-          title: task.title,
-          description: task.description,
-          status: task.status,
-          priority: task.priority,
-          assigned_to: task.assigned_to,
-          created_by: task.created_by,
-          due_date: task.due_date,
-          completed_at: task.completed_at,
-          created_at: task.created_at,
-          updated_at: task.updated_at,
-          assigned_employee: task.assigned_to ? {
-            id: task.assigned_to,
-            first_name: task.assigned_first_name,
-            last_name: task.assigned_last_name,
-            email: task.assigned_email
-          } : null,
-          created_by_employee: task.created_by ? {
-            id: task.created_by,
-            first_name: task.created_first_name,
-            last_name: task.created_last_name,
-            email: task.created_email
-          } : null
-        }));
-
-        res.status(200).json({
-          success: true,
-          tasks: formattedTasks,
-          count: formattedTasks.length
-        });
+        res.status(200).json(tasks);
         break;
 
       case 'POST':
@@ -80,68 +45,121 @@ module.exports = async function handler(req, res) {
           due_date
         } = req.body;
 
-        if (!title) {
+        if (!title || !created_by) {
           return res.status(400).json({
             success: false,
-            message: 'Le titre est requis'
+            message: 'Titre et créateur sont requis'
           });
         }
 
         const [result] = await connection.execute(
           `INSERT INTO tasks 
            (title, description, status, priority, assigned_to, created_by, due_date, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+           VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
           [title, description, status, priority, assigned_to, created_by, due_date]
         );
 
-        // Récupérer la tâche créée avec les relations
-        const [newTask] = await connection.execute(`
-          SELECT 
-            t.id, t.title, t.description, t.status, t.priority, 
-            t.assigned_to, t.created_by, t.due_date, t.completed_at, 
-            t.created_at, t.updated_at,
-            ae.first_name as assigned_first_name,
-            ae.last_name as assigned_last_name,
-            ae.email as assigned_email,
-            ce.first_name as created_first_name,
-            ce.last_name as created_last_name,
-            ce.email as created_email
-          FROM tasks t
-          LEFT JOIN employees ae ON t.assigned_to = ae.id
-          LEFT JOIN employees ce ON t.created_by = ce.id
-          WHERE t.id = ?
-        `, [result.insertId]);
+        // Récupérer la tâche créée
+        const [newTask] = await connection.execute(
+          'SELECT * FROM tasks WHERE id = ?',
+          [result.insertId]
+        );
 
-        const formattedTask = newTask[0] ? {
-          id: newTask[0].id,
-          title: newTask[0].title,
-          description: newTask[0].description,
-          status: newTask[0].status,
-          priority: newTask[0].priority,
-          assigned_to: newTask[0].assigned_to,
-          created_by: newTask[0].created_by,
-          due_date: newTask[0].due_date,
-          completed_at: newTask[0].completed_at,
-          created_at: newTask[0].created_at,
-          updated_at: newTask[0].updated_at,
-          assigned_employee: newTask[0].assigned_to ? {
-            id: newTask[0].assigned_to,
-            first_name: newTask[0].assigned_first_name,
-            last_name: newTask[0].assigned_last_name,
-            email: newTask[0].assigned_email
-          } : null,
-          created_by_employee: newTask[0].created_by ? {
-            id: newTask[0].created_by,
-            first_name: newTask[0].created_first_name,
-            last_name: newTask[0].created_last_name,
-            email: newTask[0].created_email
-          } : null
-        } : null;
+        res.status(201).json(newTask[0]);
+        break;
 
-        res.status(201).json({
-          success: true,
-          message: 'Tâche créée avec succès',
-          task: formattedTask
+      case 'PUT':
+        // Mettre à jour une tâche
+        const taskId = req.query.id;
+        if (!taskId) {
+          return res.status(400).json({ 
+            success: false,
+            message: 'ID tâche requis' 
+          });
+        }
+
+        const updateData = req.body;
+
+        // Vérifier si la tâche existe
+        const [existingTask] = await connection.execute(
+          'SELECT id FROM tasks WHERE id = ?',
+          [taskId]
+        );
+
+        if (existingTask.length === 0) {
+          return res.status(404).json({ 
+            success: false,
+            message: 'Tâche non trouvée' 
+          });
+        }
+
+        // Construire la requête de mise à jour dynamiquement
+        const updateFields = [];
+        const updateValues = [];
+
+        Object.keys(updateData).forEach(key => {
+          if (updateData[key] !== undefined && updateData[key] !== null) {
+            updateFields.push(`${key} = ?`);
+            updateValues.push(updateData[key]);
+          }
+        });
+
+        if (updateFields.length === 0) {
+          return res.status(400).json({ 
+            success: false,
+            message: 'Aucune donnée à mettre à jour' 
+          });
+        }
+
+        updateFields.push('updated_at = NOW()');
+        updateValues.push(taskId);
+
+        await connection.execute(
+          `UPDATE tasks SET ${updateFields.join(', ')} WHERE id = ?`,
+          updateValues
+        );
+
+        // Récupérer la tâche mise à jour
+        const [updatedTask] = await connection.execute(
+          'SELECT * FROM tasks WHERE id = ?',
+          [taskId]
+        );
+
+        res.status(200).json(updatedTask[0]);
+        break;
+
+      case 'DELETE':
+        // Supprimer une tâche
+        const deleteTaskId = req.query.id;
+        if (!deleteTaskId) {
+          return res.status(400).json({ 
+            success: false,
+            message: 'ID tâche requis' 
+          });
+        }
+
+        // Vérifier si la tâche existe
+        const [existingTaskDelete] = await connection.execute(
+          'SELECT id FROM tasks WHERE id = ?',
+          [deleteTaskId]
+        );
+
+        if (existingTaskDelete.length === 0) {
+          return res.status(404).json({ 
+            success: false,
+            message: 'Tâche non trouvée' 
+          });
+        }
+
+        // Supprimer la tâche
+        await connection.execute(
+          'DELETE FROM tasks WHERE id = ?',
+          [deleteTaskId]
+        );
+
+        res.status(200).json({ 
+          success: true, 
+          message: 'Tâche supprimée avec succès' 
         });
         break;
 
