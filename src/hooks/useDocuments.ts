@@ -55,7 +55,7 @@ export const useDocuments = () => {
       }
       
       const data = await response.json();
-      setDocuments(data);
+      setDocuments(Array.isArray(data) ? data : (data.documents || []));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue');
       console.error('Erreur useDocuments:', err);

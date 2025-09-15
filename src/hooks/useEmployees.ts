@@ -35,7 +35,7 @@ export const useEmployees = () => {
       setError(null);
       
       const data = await executeQuery('employees');
-      setEmployees(data.employees || []);
+      setEmployees(Array.isArray(data) ? data : (data.employees || []));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des employés';
       setError(errorMessage);

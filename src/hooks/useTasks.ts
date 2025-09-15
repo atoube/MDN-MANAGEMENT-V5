@@ -45,7 +45,7 @@ export const useTasks = () => {
       }
       
       const data = await response.json();
-      setTasks(data);
+      setTasks(Array.isArray(data) ? data : (data.tasks || []));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des tâches';
       setError(errorMessage);
