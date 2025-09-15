@@ -49,43 +49,13 @@ export const useDocuments = () => {
       setLoading(true);
       setError(null);
       
-      try {
-        const response = await fetch('/api/documents');
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des documents');
-        }
-        
-        const data = await response.json();
-        setDocuments(Array.isArray(data) ? data : (data.documents || []));
-      } catch (apiError) {
-        // Si l'API échoue, utiliser les données mockées
-        console.warn('API non disponible, utilisation des données mockées');
-        const mockData = [
-          {
-            id: 1,
-            title: 'Guide d\'utilisation',
-            description: 'Guide complet pour les utilisateurs',
-            category: 'Documentation Technique',
-            file_type: 'pdf',
-            status: 'published' as const,
-            uploaded_by: 1,
-            created_at: '2024-01-01T00:00:00Z',
-            updated_at: '2024-01-15T00:00:00Z'
-          },
-          {
-            id: 2,
-            title: 'Politique de sécurité',
-            description: 'Politique de sécurité de l\'entreprise',
-            category: 'Procédures RH',
-            file_type: 'docx',
-            status: 'draft' as const,
-            uploaded_by: 2,
-            created_at: '2024-01-05T00:00:00Z',
-            updated_at: '2024-01-15T00:00:00Z'
-          }
-        ];
-        setDocuments(mockData);
+      const response = await fetch('/api/documents');
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des documents');
       }
+      
+      const data = await response.json();
+      setDocuments(Array.isArray(data) ? data : (data.documents || []));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue');
       console.error('Erreur useDocuments:', err);

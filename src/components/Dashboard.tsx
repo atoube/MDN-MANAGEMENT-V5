@@ -25,7 +25,6 @@ import { useTasks } from '../hooks/useTasks';
 import { useRailwayConnection } from '../hooks/useRailwayConnection';
 import { PerformanceMonitor } from './PerformanceMonitor';
 import { ExportImportManager } from './ExportImportManager';
-import { DemoModeBanner } from './DemoModeBanner';
 
 interface StatCardProps {
   title: string;
@@ -213,9 +212,6 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="p-6">
-      {/* Banner Mode Démo */}
-      <DemoModeBanner />
-      
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Tableau de Bord

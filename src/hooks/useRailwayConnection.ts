@@ -53,27 +53,18 @@ export const useRailwayConnection = () => {
           lastChecked: new Date()
         });
         return data;
-      } else if (response.status === 404) {
-        // API non disponible, mode démo
-        setStatus({
-          isConnected: false,
-          isLoading: false,
-          error: 'Mode démo - API non disponible',
-          lastChecked: new Date()
-        });
-        return { message: 'Mode démo activé' };
       } else {
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
     } catch (error) {
-      // En cas d'erreur, activer le mode démo
+      const errorMessage = error instanceof Error ? error.message : 'Erreur de connexion inconnue';
       setStatus({
         isConnected: false,
         isLoading: false,
-        error: 'Mode démo - API non disponible',
+        error: errorMessage,
         lastChecked: new Date()
       });
-      return { message: 'Mode démo activé' };
+      throw error;
     }
   };
 

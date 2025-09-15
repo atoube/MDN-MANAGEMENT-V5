@@ -1,178 +1,100 @@
-// API route pour les documents - Railway
-const { getConnection } = require('./db.js');
+import mysql from 'mysql2/promise';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // Configuration CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
+  
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.status(200).end();
+    return;
   }
 
   try {
-    const connection = await getConnection();
+    const connection = await mysql.createConnection({
+      host: process.env.RAILWAY_DB_HOST || 'centerbeam.proxy.rlwy.net',
+      port: parseInt(process.env.RAILWAY_DB_PORT || '26824'),
+      user: process.env.RAILWAY_DB_USER || 'root',
+      password: process.env.RAILWAY_DB_PASSWORD || 'eNMmLvQjDIBHXwPmEqaVutQQDKTwEKsD',
+      database: process.env.RAILWAY_DB_NAME || 'railway',
+      ssl: process.env.RAILWAY_DB_SSL === 'true'
+    });
 
     switch (req.method) {
       case 'GET':
-        // Récupérer tous les documents
         const [documents] = await connection.execute(`
           SELECT 
-            d.*,
-            u.first_name as author_first_name,
-            u.last_name as author_last_name
+            d.id, d.title, d.description, d.file_path, d.file_type, d.file_size, 
+            d.category, d.status, d.uploaded_by, d.created_at, d.updated_at,
+            u.first_name as author_first_name, u.last_name as author_last_name
           FROM documents d
           LEFT JOIN users u ON d.uploaded_by = u.id
           ORDER BY d.created_at DESC
         `);
-
-        res.status(200).json(documents);
-        break;
+        await connection.end();
+        return res.status(200).json(documents);
 
       case 'POST':
-        // Créer un nouveau document
-        const {
-          title,
-          description,
-          file_path,
-          file_type,
-          file_size,
-          category,
-          status = 'draft',
-          uploaded_by
-        } = req.body;
-
-        if (!title || !uploaded_by) {
-          return res.status(400).json({
-            success: false,
-            message: 'Titre et utilisateur sont requis'
-          });
+        const { title, description, file_path, file_type, file_size, category, status, uploaded_by } = req.body;
+        if (!title || !file_path || !uploaded_by) {
+          await connection.end();
+          return res.status(400).json({ success: false, message: 'Titre, chemin du fichier et ID de l\'uploader sont requis' });
         }
-
-        const [result] = await connection.execute(
-          `INSERT INTO documents 
-           (title, description, file_path, file_type, file_size, category, status, uploaded_by, created_at, updated_at)
+        const [resultPost] = await connection.execute(
+          `INSERT INTO documents (title, description, file_path, file_type, file_size, category, status, uploaded_by, created_at, updated_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
           [title, description, file_path, file_type, file_size, category, status, uploaded_by]
         );
-
-        // Récupérer le document créé
-        const [newDocument] = await connection.execute(
-          'SELECT * FROM documents WHERE id = ?',
-          [result.insertId]
-        );
-
-        res.status(201).json(newDocument[0]);
-        break;
+        const [newDocument] = await connection.execute('SELECT * FROM documents WHERE id = ?', [resultPost.insertId]);
+        await connection.end();
+        return res.status(201).json(newDocument[0]);
 
       case 'PUT':
-        // Mettre à jour un document
         const documentId = req.query.id;
         if (!documentId) {
-          return res.status(400).json({ 
-            success: false,
-            message: 'ID document requis' 
-          });
+          await connection.end();
+          return res.status(400).json({ success: false, message: 'ID du document requis' });
         }
-
         const updateData = req.body;
-
-        // Vérifier si le document existe
-        const [existingDocument] = await connection.execute(
-          'SELECT id FROM documents WHERE id = ?',
-          [documentId]
-        );
-
-        if (existingDocument.length === 0) {
-          return res.status(404).json({ 
-            success: false,
-            message: 'Document non trouvé' 
-          });
-        }
-
-        // Construire la requête de mise à jour dynamiquement
         const updateFields = [];
         const updateValues = [];
-
-        Object.keys(updateData).forEach(key => {
-          if (updateData[key] !== undefined && updateData[key] !== null) {
+        for (const key in updateData) {
+          if (updateData[key] !== undefined) {
             updateFields.push(`${key} = ?`);
             updateValues.push(updateData[key]);
           }
-        });
-
-        if (updateFields.length === 0) {
-          return res.status(400).json({ 
-            success: false,
-            message: 'Aucune donnée à mettre à jour' 
-          });
         }
-
+        if (updateFields.length === 0) {
+          await connection.end();
+          return res.status(400).json({ success: false, message: 'Aucune donnée à mettre à jour' });
+        }
         updateFields.push('updated_at = NOW()');
         updateValues.push(documentId);
-
         await connection.execute(
           `UPDATE documents SET ${updateFields.join(', ')} WHERE id = ?`,
           updateValues
         );
-
-        // Récupérer le document mis à jour
-        const [updatedDocument] = await connection.execute(
-          'SELECT * FROM documents WHERE id = ?',
-          [documentId]
-        );
-
-        res.status(200).json(updatedDocument[0]);
-        break;
+        const [updatedDocument] = await connection.execute('SELECT * FROM documents WHERE id = ?', [documentId]);
+        await connection.end();
+        return res.status(200).json(updatedDocument[0]);
 
       case 'DELETE':
-        // Supprimer un document
         const deleteDocumentId = req.query.id;
         if (!deleteDocumentId) {
-          return res.status(400).json({ 
-            success: false,
-            message: 'ID document requis' 
-          });
+          await connection.end();
+          return res.status(400).json({ success: false, message: 'ID du document requis' });
         }
-
-        // Vérifier si le document existe
-        const [existingDocumentDelete] = await connection.execute(
-          'SELECT id FROM documents WHERE id = ?',
-          [deleteDocumentId]
-        );
-
-        if (existingDocumentDelete.length === 0) {
-          return res.status(404).json({ 
-            success: false,
-            message: 'Document non trouvé' 
-          });
-        }
-
-        // Supprimer le document
-        await connection.execute(
-          'DELETE FROM documents WHERE id = ?',
-          [deleteDocumentId]
-        );
-
-        res.status(200).json({ 
-          success: true, 
-          message: 'Document supprimé avec succès' 
-        });
-        break;
+        await connection.execute('DELETE FROM documents WHERE id = ?', [deleteDocumentId]);
+        await connection.end();
+        return res.status(200).json({ success: true, message: 'Document supprimé avec succès' });
 
       default:
-        res.status(405).json({
-          success: false,
-          message: 'Méthode non autorisée'
-        });
+        await connection.end();
+        return res.status(405).json({ success: false, message: 'Méthode non autorisée' });
     }
   } catch (error) {
     console.error('Erreur dans l\'API documents:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erreur interne du serveur',
-      error: error.message
-    });
+    return res.status(500).json({ success: false, message: 'Erreur interne du serveur', error: error.message });
   }
-};
+}
